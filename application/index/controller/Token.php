@@ -25,17 +25,19 @@ class Token
         // date_default_timezone_set(self::$timezone);
         self::$config = self::config();
     }
+
     public static function config()
     {
         $configuration = Configuration::forSymmetricSigner(
-            // You may use any HMAC variations (256, 384, and 512)
+        // You may use any HMAC variations (256, 384, and 512)
             new Sha256(),
             // replace the value below with a key of your own!
             InMemory::base64Encoded('mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw=')
-            // You may also override the JOSE encoder/decoder if needed by providing extra arguments here
+        // You may also override the JOSE encoder/decoder if needed by providing extra arguments here
         );
         return $configuration;
     }
+
     /**
      * JWT ( JSON Web Token ) 由三部分组成:
      * header / payload / signature

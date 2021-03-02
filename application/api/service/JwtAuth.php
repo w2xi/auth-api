@@ -4,27 +4,28 @@ namespace app\api\service;
 
 use app\api\exception\JwtTokenExpiredException;
 use app\api\exception\JwtTokenMissingException;
+use app\api\exception\NeedPermissionException;
 use DateTimeImmutable;
 use DateTimeZone;
-use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Validation\Constraint;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
+use Lcobucci\Clock\SystemClock;
 
 class JwtAuth
 {
-    private static $instance;
+    protected static $instance;
     // a base64Encoded string
     private static $secret = 'mBC5v1sOKVvbdEitdSBenu59nfNfhwkedkJVNabosTw=';
-    private static $config;
-    private $token;
-    private $decodeToken;
-    private $uid;
-    private $iss             = 'api.w2xi.com';
-    private $aud             = 'test.com';
-    private static $timezone = 'Asia/Shanghai';
+    protected static $config;
+    protected $token;
+    protected $decodeToken;
+    protected $uid;
+    protected $iss             = 'api.w2xi.com';
+    protected $aud             = 'test.com';
+    protected static $timezone = 'Asia/Shanghai';
 
     private function __construct()
     {}
@@ -41,7 +42,7 @@ class JwtAuth
         return self::$instance;
     }
 
-    private static function config()
+    public static function config()
     {
         $configuration = Configuration::forSymmetricSigner(
             // You may use any HMAC variations (256, 384, and 512)
@@ -62,6 +63,7 @@ class JwtAuth
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now->modify('+1 minute'))
             ->expiresAt($now->modify('+1 hour'))
+            ->withClaim('uid', $this->uid)
             ->getToken(self::$config->signer(), self::$config->signingKey());
 
         return $this;
@@ -122,7 +124,7 @@ class JwtAuth
         try {
             self::$config->validator()->assert($this->decodeToken, ...$constraints);
         } catch (RequiredConstraintsViolated $e) {
-            throw new NeedPermission($e->getMessage());
+            throw new NeedPermissionException($e->getMessage());
         }
     }
 
@@ -143,14 +145,10 @@ class JwtAuth
     }
 
 
-    public function verify($token)
+    public function verify()
     {
-    	if (!$token) {
-            throw new JwtTokenMissingException();
-        }
     	$clock  = new SystemClock(new DateTimeZone(self::$timezone));
         self::instance()
-            ->setToken($token)
             ->setValidationConstraints(
                 new Constraint\IssuedBy($this->iss),
                 new Constraint\PermittedFor($this->aud),

@@ -9,4 +9,47 @@
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-// 应用公共文件
+if ( !function_exists('__success') )
+{
+    function __success($data = null, $msg = 'success')
+    {
+        $result = [
+            'code'  =>  10000,
+            'msg'   =>  $msg,
+            'data'  =>  $data,
+        ];
+
+        return json($result);
+    }
+}
+
+if ( !function_exists('__error') )
+{
+    function __error($msg = 'failure', $data = null)
+    {
+        $result = [
+            'code'  =>  10001,
+            'msg'   =>  $msg,
+            'data'  =>  $data,
+        ];
+
+        return json($result);
+    }
+}
+
+if ( !function_exists('genRandomChar') )
+{
+    // generate random string of given length
+    function genRandomChar($length = 6)
+    {
+        $str = '';
+        $chars = '123456789abcdefghjkmnpqrstuvwxyABCDEFGHJKLMNPQRSTUVWXY';
+
+        for ( $i = 0; $i < $length; $i++ ){
+            $str .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+
+        return $str;
+    }
+}
+

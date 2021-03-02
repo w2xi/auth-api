@@ -31,7 +31,7 @@ class ExceptionHandler extends Handle
 		}
 
 		$result = [
-			'errorCode'=>	$this->errorCode,
+			'code'      =>	$this->errorCode,
 			'msg'		=>	$this->msg,
 			'url'		=>	request()->url()
 		];
