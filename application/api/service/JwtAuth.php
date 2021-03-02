@@ -3,16 +3,16 @@
 namespace app\api\service;
 
 use app\api\exception\JwtTokenExpiredException;
-use app\api\exception\JwtTokenMissingException;
 use app\api\exception\NeedPermissionException;
 use DateTimeImmutable;
 use DateTimeZone;
+use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Token\RegisteredClaims;
 use Lcobucci\JWT\Validation\Constraint;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
-use Lcobucci\Clock\SystemClock;
 
 class JwtAuth
 {
@@ -80,6 +80,11 @@ class JwtAuth
         return $this->uid;
     }
 
+    public function getExpireTime()
+    {
+        return $this->token->claims()->get(RegisteredClaims::EXPIRATION_TIME);
+    }
+
     public function getToken()
     {
         return $this->token->toString();
@@ -101,7 +106,7 @@ class JwtAuth
         return $this;
     }
 
-    public function validExpiration()
+    protected function validExpiration()
     {
         $now = new DateTimeImmutable('now', new DateTimeZone(self::$timezone));
         if ($this->decodeToken->isExpired($now)) {
@@ -110,7 +115,7 @@ class JwtAuth
         return $this;
     }
 
-    public function setValidationConstraints(Constraint...$constraints)
+    protected function setValidationConstraints(Constraint...$constraints)
     {
         self::$config->setValidationConstraints(
             ...$constraints
@@ -118,7 +123,7 @@ class JwtAuth
         return $this;
     }
 
-    public function validate()
+    protected function validate()
     {
         $constraints = self::$config->validationConstraints();
         try {
@@ -128,33 +133,26 @@ class JwtAuth
         }
     }
 
-    public function validateToken($token)
+    public function refreshValidate()
     {
-        if (!$token) {
-            throw new JwtTokenMissingException();
-        }
-        self::instance()
-            ->setToken($token)
-            ->setValidationConstraints(
-                new Constraint\IssuedBy($this->iss),
-                new Constraint\PermittedFor($this->aud),
-                new Constraint\SignedWith(self::$config->signer(), self::$config->verificationKey())
-            )
+        $this->setValidationConstraints(
+            new Constraint\IssuedBy($this->iss),
+            new Constraint\PermittedFor($this->aud),
+            new Constraint\SignedWith(self::$config->signer(), self::$config->verificationKey())
+        )
             ->decode()
             ->validate();
     }
 
-
     public function verify()
     {
-    	$clock  = new SystemClock(new DateTimeZone(self::$timezone));
-        self::instance()
-            ->setValidationConstraints(
-                new Constraint\IssuedBy($this->iss),
-                new Constraint\PermittedFor($this->aud),
-                new Constraint\SignedWith(self::$config->signer(), self::$config->verificationKey()),
-                new Constraint\ValidAt($clock)
-            )
+        $clock = new SystemClock(new DateTimeZone(self::$timezone));
+        $this->setValidationConstraints(
+            new Constraint\IssuedBy($this->iss),
+            new Constraint\PermittedFor($this->aud),
+            new Constraint\SignedWith(self::$config->signer(), self::$config->verificationKey()),
+            new Constraint\ValidAt($clock)
+        )
             ->decode()
             ->validExpiration()
             ->validate();

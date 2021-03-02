@@ -8,5 +8,5 @@ use think\Model;
 
 class ApiToken extends Model
 {
-
+	
 }
