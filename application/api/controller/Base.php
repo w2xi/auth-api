@@ -4,9 +4,8 @@ namespace app\api\controller;
 
 use app\api\exception\JwtTokenMissingException;
 use app\service\JwtAuth;
-use think\Controller;
 
-class Base extends Controller
+class Base
 {
     /**
      * @var int
