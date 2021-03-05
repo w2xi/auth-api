@@ -2,18 +2,22 @@
 
 namespace app\api\controller\v1;
 
-use app\api\controller\Auth;
+use app\api\controller\Base;
 use app\api\model\ApiToken as ApiTokenModel;
 use app\api\model\User as UserModel;
 use app\api\service\JwtAuth;
 use think\Request;
 
-class User extends Auth
+class User extends Base
 {
+    protected $noNeedLogin = ['login', 'register'];
+    
     public function register(Request $request)
     {
+        return json($request->post());        
         $username       = $request->post('username');
         $password       = $request->post('password');
+        $ackPassword    = $request->post('ackPassword');
         $salt           = genRandomChar(6);
         $cryptoPassword = md5(md5($password) . $salt);
 
@@ -27,9 +31,9 @@ class User extends Auth
 
         return __success();
     }
-
     public function login(Request $request)
     {
+        return json($request->post());
         $username = $request->post('username');
         $password = $request->post('password');
 
