@@ -21,6 +21,6 @@ class Token
             throw new NeedPermissionException();
         }
 
-        return __success(['token' => $instance->getToken()]);
+        return _success(['token' => $instance->getToken()]);
     }
 }

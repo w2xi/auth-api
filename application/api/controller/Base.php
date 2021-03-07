@@ -3,7 +3,7 @@
 namespace app\api\controller;
 
 use app\api\exception\JwtTokenMissingException;
-use app\service\JwtAuth;
+use app\api\service\JwtAuth;
 
 class Base
 {
@@ -24,14 +24,14 @@ class Base
             return;
         }
         // if current api action mathchd by match method with noNeedLogin prop and token in request headers.
-        if (request()->header('token')) {
+        if (request()->header('Authorization')) {
             // todo#1
         }
     }
 
     public function checkToken()
     {
-        $token = request()->header('token');
+        $token = request()->header('Authorization');
         if (!$token) {
             throw new JwtTokenMissingException();
         }
@@ -48,7 +48,7 @@ class Base
     {
         $arr    = is_array($arr) ? $arr : explode(',', $arr);
         if (!$arr) {
-            return fasle;
+            return false;
         }
         $arr    = array_map('strtolower', $arr);
 
@@ -56,6 +56,6 @@ class Base
             return true;
         }
 
-        return fasle;
+        return false;
     }
 }

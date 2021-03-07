@@ -9,9 +9,9 @@
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-if ( !function_exists('__success') )
+if ( !function_exists('_success') )
 {
-    function __success($data = null, $msg = 'success')
+    function _success($data = null, $msg = 'success')
     {
         $result = [
             'code'  =>  10000,
@@ -23,9 +23,9 @@ if ( !function_exists('__success') )
     }
 }
 
-if ( !function_exists('__error') )
+if ( !function_exists('_error') )
 {
-    function __error($msg = 'failure', $data = null)
+    function _error($msg = 'failure', $data = null)
     {
         $result = [
             'code'  =>  10001,

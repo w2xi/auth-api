@@ -4,7 +4,7 @@ namespace app\api\exception;
 
 class JwtTokenMissingException extends BaseException
 {
-	public $statusCode = 403;
+	public $statusCode = 400;
 	public $msg = 'No JWT token found in request headers';
-	public $code = 1001;
+	public $errorCode = 1001;
 }
