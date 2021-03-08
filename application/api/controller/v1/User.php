@@ -12,6 +12,8 @@ class User extends Base
 {
     protected $noNeedLogin = ['login', 'register'];
 
+    protected $errorMsg = '';
+
     public function register(Request $request)
     {
         $username       = $request->post('username');
@@ -77,10 +79,7 @@ class User extends Base
 
     public function profile(Request $request)
     {
-        $token = $request->header('Authorization');
-        JwtAuth::instance()->setToken($token)->verify();
-
-        $userInfo = UserModel::get(JwtAuth::instance()->getUid());
+        $userInfo = UserModel::get($this->userId);
 
         return _success($userInfo);
     }
@@ -89,7 +88,7 @@ class User extends Base
     {
         $cryptoPassword = md5(md5($password) . $userInfo->salt);
         if ($cryptoPassword !== $userInfo->password) {
-            $this->errorMsg = 'Your password is not valid';
+            $this->errorMsg = 'Password not valid';
             return false;
         }
         return true;

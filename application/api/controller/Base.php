@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\api\exception\JwtTokenMissingException;
 use app\api\service\JwtAuth;
+use app\api\model\User as UserModel;
 
 class Base
 {
