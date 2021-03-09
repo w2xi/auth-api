@@ -61,7 +61,8 @@ class JwtAuth
             ->issuedBy($this->iss)
             ->permittedFor($this->aud)
             ->issuedAt($now)
-            // it means the token can only be used after 1 minute
+            // it means the token can only be used after 1 minute,
+            // just comment it.
             // ->canOnlyBeUsedAfter($now->modify('+1 minute'))
             ->expiresAt($now->modify('+1 hour'))
             ->withClaim('uid', $this->uid)
