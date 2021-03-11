@@ -58,23 +58,20 @@ class User extends Base
         // issue token
         $token      = $instance->setUid($user->id)->encode()->getToken();
         $expireTime = $instance->getExpireTime()->getTimestamp();
+        $data = [
+            'user_id'       =>  $user->id,
+            'token'         =>  $token,
+            'expire_time'   =>  $expireTime,
+        ];
         if ($apiToken) {
             $apiToken->token       = $token;
             $apiToken->expire_time = $expireTime;
             $apiToken->save();
         } else {
-            ApiTokenModel::create([
-                'user_id'     => $user->id,
-                'token'       => $token,
-                'expire_time' => $expireTime,
-            ]);
+            ApiTokenModel::create($data);
         }
 
-        return _success([
-            'user_id'     => $user->id,
-            'token'       => $token,
-            'expire_time' => $expireTime,
-        ]);
+        return _success($data);
     }
 
     public function profile(Request $request)

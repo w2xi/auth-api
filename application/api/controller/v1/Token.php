@@ -10,7 +10,7 @@ class Token
 {
     public function refresh()
     {
-        $token = request()->header('token');
+        $token = request()->header('Authorization');
         if (!$token) {
             throw new JwtTokenMissingException();
         }
