@@ -4,4 +4,6 @@
 
 return [
 	'exception_handle'	=>	'\\app\\api\\exception\\ExceptionHandler',
+    'upload_prefix'     =>  'http://wjlshop.com/uploads',
+    'upload_dir'        =>  'api',
 ];

@@ -9,8 +9,12 @@ class Blog extends Base
 {
 	public function add(Request $request)
 	{
+	    [
+	        'content'   =>  '',
+            'images'    =>  ''
+        ];
 		$data = $request->post();
-		echo json_encode($data);
+		var_dump($data);
 	}
 
 	public function upload(Request $request)
@@ -18,10 +22,10 @@ class Blog extends Base
 		$file = $request->file('file');
 		$savePath = ROOT_PATH.'public'.DS.'uploads';
 		$info = $file
-							->validate(['ext'=>'png,jpg,jpeg,gif', 'size'=>1024*1024*5])
-							->move($savePath);
+                ->validate(['ext'=>'png,jpg,jpeg,gif', 'size'=>1024*1024*5])
+                ->move($savePath);
 		if ( $info ){
-			return _success(['url'=>$savePath.DS.$info->getSaveName()]);
+			return _success(['url'=>'/uploads'.DS.$info->getSaveName()]);
 		}else{
 			return _error('upload failure');
 		}
