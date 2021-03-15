@@ -19,7 +19,8 @@
         "php": ">=5.4.0",
         "topthink/framework": "5.0.*",
         "lcobucci/jwt": "^3.4",
-        "lcobucci/clock": "^1.2"
+        "lcobucci/clock": "^1.2",
+        "delight-im/file-upload": "^1.2"
     },
     "autoload": {
         "psr-4": {
