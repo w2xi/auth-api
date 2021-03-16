@@ -4,13 +4,8 @@ namespace app\api\model;
 
 use think\Model;
 
-class Blog extends Model
+class Blog extends BaseModel
 {
-	protected $autoWriteTimestamp = true;
-	// 定义时间戳字段名
-  protected $createTime = 'create_at';
-  protected $updateTime = false;
-
   public function user()
   {
   	return $this->belongsTo('User', 'user_id', 'id')->field('id,username,avatar');

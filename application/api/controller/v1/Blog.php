@@ -6,9 +6,65 @@ use app\api\controller\Base;
 use app\api\validate\IDMustBePositiveInt;
 use think\Request;
 use app\api\model\Blog as BlogModel;
+use app\api\model\BlogLike as BlogLikeModel;
+use app\api\model\BLogComment as BLogCommentModel;
+use app\api\validate\Blog as BlogValidate;
 
 class Blog extends Base
 {
+    public function search($keyword = '')
+    {
+        $result = (new BlogModel())->whereLike('content', "%{$keyword}%")->select();
+
+        return _success($result);
+    }
+
+    public function comment(Request $request)
+    {
+        (new BlogValidate)->scene('comment')->goCheck();
+        $blogId = $request->post('id');
+        $content = $request->post('content', 'htmlspecialchars');
+        $blog = BlogModel::get($blogId);
+
+        if ( !$blog ){
+            return _error('the blog item not exists');
+        }
+        $comment = BLogCommentModel::create([
+            'blog_id'   =>  $blogId,
+            'user_id'   =>  $this->userId,
+            'content'   =>  $content,
+        ]);
+
+        return _success($comment);
+    }
+
+    public function like(Request $request)
+    {
+        (new IDMustBePositiveInt())->goCheck();
+        $blogId = $request->post('id/d');
+        $blog = BlogModel::get($blogId);
+
+        if ( !$blog ){
+            return _error('the blog item not exists');
+        }
+        $blogLike = BlogLikeModel::like(['blog_id'=>$blogId, 'user_id'=>$this->userId]);
+        
+        if ( $blogLike ){
+            $blogLike->like ? $blog->like_count-- : $blog->like_count++;
+            $blogLike->like = !$blogLike->like;
+            $blogLike->save();
+        }else{
+            $blogLike = BlogLikeModel::create([
+                'blog_id'   =>  $blogId,
+                'user_id'   =>  $this->userId,
+            ]);
+            $blog->like_count++;
+        }
+        $blog->save();
+
+        return _success($blogLike);
+    }
+
     public function detail(Request $request)
     {
         (new IDMustBePositiveInt())->goCheck();
