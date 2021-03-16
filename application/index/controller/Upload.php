@@ -16,11 +16,33 @@ class Upload
 </form>';
 	}
 
-	public function upload(\think\Request $request)
-	{
-		$file = $request->file('file');
+	public function upload()
+    {
+        $upload = new \Delight\FileUpload\FileUpload();
+        $upload->withTargetDirectory(UPLOAD_PATH . date('Y-m-d'));
+        $upload->from('file');
 
-		echo '<pre>';
-		var_dump($file);
-	}
+        try {
+            $uploadedFile = $upload->save();
+
+            // success
+
+            // $uploadedFile->getFilenameWithExtension()
+            // $uploadedFile->getFilename()
+            // $uploadedFile->getExtension()
+            // $uploadedFile->getDirectory()
+            // $uploadedFile->getPath()
+            // $uploadedFile->getCanonicalPath()
+        } catch (\Delight\FileUpload\Throwable\InputNotFoundException $e) {
+            // input not found
+        } catch (\Delight\FileUpload\Throwable\InvalidFilenameException $e) {
+            // invalid filename
+        } catch (\Delight\FileUpload\Throwable\InvalidExtensionException $e) {
+            // invalid extension
+        } catch (\Delight\FileUpload\Throwable\FileTooLargeException $e) {
+            // file too large
+        } catch (\Delight\FileUpload\Throwable\UploadCancelledException $e) {
+            // upload cancelled
+        }
+    }
 }

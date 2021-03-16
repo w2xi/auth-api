@@ -37,6 +37,6 @@ class Blog extends Model
 
   public static function getList($page, $count)
   {
-  	return self::with('user')->page($page, $count)->select();
+  	return self::with('user')->order('id desc')->page($page, $count)->select();
   }
 }

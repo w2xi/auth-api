@@ -15,7 +15,10 @@ class Blog extends Base
         $blog = BlogModel::get($request->param('id'));
 
         if ( !$blog ){
-            _error('blog item not exists');
+        $blog = BlogModel::get($request->param('id'), ['user']);
+
+        if (!$blog) {
+            return _error('blog item not exists');
         }
 
         return _success($blog);
@@ -37,12 +40,12 @@ class Blog extends Base
             'images'  => '',
         ];
         $content = $request->post('content');
-        $images = $request->post('images/a');
-        $data = [
-        	'content'	=>	$content,
-        	'user_id'	=>	$this->userId,
-        	'images'	=>	$images,
-        ];     
+        $images  = $request->post('images/a');
+        $data    = [
+            'content' => $content,
+            'user_id' => $this->userId,
+            'images'  => $images,
+        ];
         $result = BlogModel::create($data);
 
         return _success($result);
@@ -51,14 +54,13 @@ class Blog extends Base
     public function upload(Request $request)
     {
         $files    = $request->file('file');
-        $savePath = ROOT_PATH . 'public' . DS . 'uploads';
-        $fileUrl = [];
-        $flag = true;
-
-        foreach( $files as $file ){
-            $info     = $file
+        $fileUrl  = [];
+        $flag     = true;
+        
+        foreach ($files as $file) {
+            $info = $file
                 ->validate(['ext' => 'png,jpg,jpeg,gif', 'size' => 1024 * 1024 * 5])
-                ->move($savePath);
+                ->move(UPLOAD_PATH);
             if ($info) {
                 array_push($fileUrl, '/uploads' . DS . $info->getSaveName());
             } else {
