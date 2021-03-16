@@ -3,12 +3,12 @@
 namespace app\api\controller\v1;
 
 use app\api\controller\Base;
+use app\api\model\Blog as BlogModel;
+use app\api\model\BLogComment as BLogCommentModel;
+use app\api\model\BlogLike as BlogLikeModel;
+use app\api\validate\Blog as BlogValidate;
 use app\api\validate\IDMustBePositiveInt;
 use think\Request;
-use app\api\model\Blog as BlogModel;
-use app\api\model\BlogLike as BlogLikeModel;
-use app\api\model\BLogComment as BLogCommentModel;
-use app\api\validate\Blog as BlogValidate;
 
 class Blog extends Base
 {
@@ -22,17 +22,17 @@ class Blog extends Base
     public function comment(Request $request)
     {
         (new BlogValidate)->scene('comment')->goCheck();
-        $blogId = $request->post('id');
+        $blogId  = $request->post('id');
         $content = $request->post('content', 'htmlspecialchars');
-        $blog = BlogModel::get($blogId);
+        $blog    = BlogModel::get($blogId);
 
-        if ( !$blog ){
+        if (!$blog) {
             return _error('the blog item not exists');
         }
         $comment = BLogCommentModel::create([
-            'blog_id'   =>  $blogId,
-            'user_id'   =>  $this->userId,
-            'content'   =>  $content,
+            'blog_id' => $blogId,
+            'user_id' => $this->userId,
+            'content' => $content,
         ]);
 
         return _success($comment);
@@ -42,21 +42,21 @@ class Blog extends Base
     {
         (new IDMustBePositiveInt())->goCheck();
         $blogId = $request->post('id/d');
-        $blog = BlogModel::get($blogId);
+        $blog   = BlogModel::get($blogId);
 
-        if ( !$blog ){
+        if (!$blog) {
             return _error('the blog item not exists');
         }
-        $blogLike = BlogLikeModel::like(['blog_id'=>$blogId, 'user_id'=>$this->userId]);
-        
-        if ( $blogLike ){
+        $blogLike = BlogLikeModel::like(['blog_id' => $blogId, 'user_id' => $this->userId]);
+
+        if ($blogLike) {
             $blogLike->like ? $blog->like_count-- : $blog->like_count++;
             $blogLike->like = !$blogLike->like;
             $blogLike->save();
-        }else{
+        } else {
             $blogLike = BlogLikeModel::create([
-                'blog_id'   =>  $blogId,
-                'user_id'   =>  $this->userId,
+                'blog_id' => $blogId,
+                'user_id' => $this->userId,
             ]);
             $blog->like_count++;
         }
@@ -70,23 +70,24 @@ class Blog extends Base
         (new IDMustBePositiveInt())->goCheck();
         $blog = BlogModel::get($request->param('id'));
 
-        if ( !$blog ){
-        $blog = BlogModel::get($request->param('id'), ['user']);
-
         if (!$blog) {
-            return _error('blog item not exists');
-        }
+            $blog = BlogModel::get($request->param('id'), ['user']);
 
-        return _success($blog);
+            if (!$blog) {
+                return _error('blog item not exists');
+            }
+
+            return _success($blog);
+        }
     }
 
     public function read(Request $request)
     {
-         $page = $request->param('page', 1);
-         $count = $request->param('count', 10);
-         $result = BlogModel::getList($page, $count);
+        $page   = $request->param('page', 1);
+        $count  = $request->param('count', 10);
+        $result = BlogModel::getList($page, $count);
 
-         return _success($result);
+        return _success($result);
     }
 
     public function add(Request $request)
@@ -109,10 +110,10 @@ class Blog extends Base
 
     public function upload(Request $request)
     {
-        $files    = $request->file('file');
-        $fileUrl  = [];
-        $flag     = true;
-        
+        $files   = $request->file('file');
+        $fileUrl = [];
+        $flag    = true;
+
         foreach ($files as $file) {
             $info = $file
                 ->validate(['ext' => 'png,jpg,jpeg,gif', 'size' => 1024 * 1024 * 5])
@@ -124,7 +125,7 @@ class Blog extends Base
                 break;
             }
         }
-        if ( $flag ){
+        if ($flag) {
             return _success($fileUrl);
         }
 
