@@ -68,17 +68,12 @@ class Blog extends Base
     public function detail(Request $request)
     {
         (new IDMustBePositiveInt())->goCheck();
-        $blog = BlogModel::get($request->param('id'));
+        $blog = BlogModel::get($request->param('id'), ['user']);
 
         if (!$blog) {
-            $blog = BlogModel::get($request->param('id'), ['user']);
-
-            if (!$blog) {
-                return _error('blog item not exists');
-            }
-
-            return _success($blog);
+            return _error('blog item not exists');
         }
+        return _success($blog);
     }
 
     public function read(Request $request)
