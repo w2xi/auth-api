@@ -7,6 +7,7 @@ use app\api\model\ApiToken as ApiTokenModel;
 use app\api\model\User as UserModel;
 use app\api\service\JwtAuth;
 use think\Request;
+use app\api\validate\User as UserValidate;
 
 class User extends Base
 {
@@ -16,6 +17,7 @@ class User extends Base
 
     public function register(Request $request)
     {
+        (new UserValidate())->scene('register')->goCheck();
         $username       = $request->post('username');
         $password       = $request->post('password');
         $ackPassword    = $request->post('ackPassword');
@@ -42,6 +44,7 @@ class User extends Base
     }
     public function login(Request $request)
     {
+        (new UserValidate())->scene('login')->goCheck();
         $username = $request->post('username');
         $password = $request->post('password');
 
@@ -62,6 +65,7 @@ class User extends Base
             'user_id'       =>  $user->id,
             'token'         =>  $token,
             'expire_time'   =>  $expireTime,
+            'userInfo'      =>  $user,
         ];
         if ($apiToken) {
             $apiToken->token       = $token;
@@ -81,9 +85,40 @@ class User extends Base
         return _success($userInfo);
     }
 
+    public function edit(Request $request)
+    {
+        (new UserValidate())->scene('edit')->goCheck();
+        $data = [
+            'username'  =>  $request->post('nickname'),
+            'bio'       =>  $request->post('bio'),
+        ];
+        $file = $request->file('file');
+
+        if ( $file ){
+            $info = $file->validate(['size'=>1024*1024*5, 'ext'=>'png,jpg,jpeg'])->move(UPLOAD_PATH.'avatar');
+            if ( $info ){
+                $data['avatar'] = '/uploads/avatar'.$info->getSaveName();
+            }else{
+                return _error($info->getError());
+            }
+        }
+        Db::startTrans();
+        try{
+            $user = UserModel::get($this->userId);
+            $user->save($data, ['id'=>$this->userId]);
+            Db::commit();
+        }catch(\Exception $e){
+            Db::rollback();
+            return _error('edit failed');
+        }
+
+        return _success('edit successfully');
+    }
+
     private function verifyPassword($password, $userInfo)
     {
         $cryptoPassword = md5(md5($password) . $userInfo->salt);
+
         if ($cryptoPassword !== $userInfo->password) {
             $this->errorMsg = 'Password not valid';
             return false;
