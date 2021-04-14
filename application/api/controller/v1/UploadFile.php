@@ -4,17 +4,12 @@ namespace app\api\controller\v1;
 
 use think\Request;
 use think\File;
+use traits\controller\Jump;
 
 class UploadFile 
 {
     public function test()
     {
-        echo md5_file(UPLOAD_PATH . 'test/07/ea335b77ad23bb411cdcdbc82f7c55.png');
-    }
-
-    public function upload()
-    {
-
         $upload = new \Delight\FileUpload\FileUpload();
         $upload->withTargetDirectory(UPLOAD_PATH.'test/');
         $upload->from('file');
@@ -24,7 +19,7 @@ class UploadFile
         
         // success
         $data = [];
-        $data['filenameWithExtention'] = $uploadedFile->getFilenameWithExtension();
+        $data['filenameWithExtension'] = $uploadedFile->getFilenameWithExtension();
         $data['filename'] = $uploadedFile->getFilename();
         $data['extension'] = $uploadedFile->getExtension();
         $data['directory'] = $uploadedFile->getDirectory();
@@ -34,25 +29,83 @@ class UploadFile
         return json($data);
     }
 
-    public function uploadWithTp(Request $request)
+    public function nativeMultiUploadFile()
     {
-        // $file = $_FILES['file'];
-        // echo '<pre>';
-        // print_r($file);
+        $files = $_FILES['file'];
 
-        // multiple file upload
+        if ( $files ){
+            if ( is_array($files) ){
+                $arr = [];
+                $keys = array_keys($files);
 
-        $file = $request->file('file');
-
-        foreach ($file as $value) {
-            $this->singleUpload($value);
+                for ( $i = 0; $i < count($files['name']); $i++ )
+                {
+                    foreach ( $keys as $key )
+                    {
+                        $arr[$i][$key] = $files[$key][$i];
+                    }
+                }
+                if ( $arr ){
+                    foreach ( $arr as $file )
+                    {
+                        $this->nativeSingleUpload($file);
+                    }
+                }
+            }
         }
-
-        // $this->singleUpload($file);
     }
 
-    public function singleUpload(File $file = null)
+    public function nativeSingleUpload($file = null)
     {
+        $file = $file ?: $_FILES['file'];
+
+        if ( $file ){
+            if ( is_uploaded_file($file['tmp_name'])) {
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = md5(microtime(true)) . '.' . $ext;
+                $saveDir = UPLOAD_PATH . 'test';
+
+                if ( !file_exists($saveDir) ){
+                    mkdir($saveDir, 0755, true);
+                }
+                if ( !move_uploaded_file($file['tmp_name'], UPLOAD_PATH . 'test/' . $filename) ){
+                    return _error('上传失败');
+                }
+            }else{
+                return _error('非法文件');
+            }
+        }
+
+        pp($file);
+
+        return true;
+    }
+
+    public function multiUploadFileWithTp(Request $request)
+    {
+        $files = $request->file('file');
+
+        if ( $files ){
+            $arr = [];
+            if ( is_array($files) ){
+                foreach ( $files as $file ){
+                    $info = $file->validate(['size'=>1024*1024*5, 'ext'=>'jpg,png'])->move(UPLOAD_PATH . 'test');
+                    if ( $info ){
+                        $arr[] = str_replace('\\', '/', UPLOAD_PATH . 'test/' . $info->getSaveName());
+                    }
+                }
+                return _success($arr);
+            }
+        }else{
+            return _success('请选择上传的文件');
+        }
+    }
+
+    public function singleUploadWithTp(File $file = null)
+    {
+//        $file = new File($_FILES['file']['tmp_name']);
+//        $file = $file->setUploadInfo($_FILES['file']);
+
         $file = $file ?? request()->file('file');
 
         if ( $file ){
@@ -74,7 +127,7 @@ class UploadFile
     {
         // nowdoc
         $form = <<<'EOD'
-<form enctype="multipart/form-data" action="uploadWithTp" method="POST">
+<form enctype="multipart/form-data" action="nativeMultiUploadFile" method="POST">
 <!-- MAX_FILE_SIZE must precede the file input field -->
 <input type="hidden" name="MAX_FILE_SIZE" value="1073741824" />
 <!-- Name of input element determines name in $_FILES array -->
