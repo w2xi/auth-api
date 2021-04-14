@@ -12,7 +12,15 @@
 // 应用行为扩展定义文件
 return [
     // 应用初始化
-    'app_init'     => ['app\\api\\behavior\\CORS'],
+    'app_init'     => [
+        'app\\api\\behavior\\CORS',
+        'app\\api\\behavior\\Test',
+        'app\\api\\behavior\\Test::helloTest',
+        ['app\\api\\behavior\\Test', 'arrayTest'],
+        function(){
+            // dd('closure test');
+        },
+    ],
     // 应用开始
     'app_begin'    => [],
     // 模块初始化
