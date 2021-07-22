@@ -20,7 +20,7 @@ define('UPLOAD_PATH', __DIR__ . '/uploads/');
 
 if ( !function_exists('dd') )
 {
-    function dd($data, $exit = false, $type = 'text')
+    function dd($data = null, $exit = false, $type = 'text')
     {
         if ( is_array($data) ){
             if ( $type === 'json' ){

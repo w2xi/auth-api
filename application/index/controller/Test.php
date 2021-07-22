@@ -6,6 +6,6 @@ class Test
 {
     public function index()
     {
-        dd('[current file] => ' . __FILE__);
+        phpinfo();
     }
 }
