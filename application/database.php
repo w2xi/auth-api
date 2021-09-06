@@ -17,9 +17,9 @@ return [
     // 数据库名
     'database'        => 'test',
     // 用户名
-    'username'        => 'root',
+    'username'        => 'w2xi',
     // 密码
-    'password'        => 'root',
+    'password'        => '123456',
     // 端口
     'hostport'        => '',
     // 连接dsn

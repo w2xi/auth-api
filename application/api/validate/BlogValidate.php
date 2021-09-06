@@ -2,7 +2,7 @@
 
 namespace app\api\validate;
 
-class Blog extends BaseValidate
+class BlogValidate extends BaseValidate
 {
     protected $rule = [
         'id'        =>  'requrie|isPositiveInteger',

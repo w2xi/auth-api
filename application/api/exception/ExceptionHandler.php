@@ -2,7 +2,7 @@
 
 namespace app\api\exception;
 
-use think\Exception\Handle;
+use think\exception\Handle;
 use Exception;
 use think\Log;
 
@@ -27,7 +27,7 @@ class ExceptionHandler extends Handle
 			$this->msg = 'we encounter an error -_- => '.$e->getMessage();
 			$this->errorCode = 999;
 
-			$this->recordErrorLog($e);
+//			$this->recordErrorLog($e);
 		}
 
 		$result = [

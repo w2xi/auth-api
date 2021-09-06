@@ -7,7 +7,7 @@ use app\api\model\Blog as BlogModel;
 use app\api\model\BLogComment as BlogCommentModel;
 use app\api\model\BlogLike as BlogLikeModel;
 use app\api\model\BlogCommentLike as BlogCommentLikeModel;
-use app\api\validate\Blog as BlogValidate;
+use app\api\validate\BlogValidate;
 use app\api\validate\IDMustBePositiveInt;
 use think\Request;
 

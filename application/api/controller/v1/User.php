@@ -7,7 +7,7 @@ use app\api\model\ApiToken as ApiTokenModel;
 use app\api\model\User as UserModel;
 use app\api\service\JwtAuth;
 use think\Request;
-use app\api\validate\User as UserValidate;
+use app\api\validate\UserValidate;
 
 class User extends Base
 {
@@ -45,8 +45,8 @@ class User extends Base
     public function login(Request $request)
     {
         (new UserValidate())->scene('login')->goCheck();
-        $username = $request->post('username');
-        $password = $request->post('password');
+        $username = $request->param('username');
+        $password = $request->param('password');
 
         $user = (new UserModel())->where('username', $username)->find();
         if (!$user) {

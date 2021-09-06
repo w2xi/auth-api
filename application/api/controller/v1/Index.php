@@ -1,13 +1,13 @@
 <?php
 
 
-namespace app\index\controller;
+namespace app\api\controller\v1;
 
 
 class Index
 {
     public function index()
     {
-        dd('Hello');
+        dd(1212);
     }
 }

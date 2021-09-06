@@ -2,9 +2,7 @@
 
 namespace app\api\validate;
 
-use think\Validate;
-
-class User extends Validate
+class UserValidate extends BaseValidate
 {
     protected $rule = [
         'username'  =>  'require|isNotEmpty',
