@@ -26,4 +26,15 @@ class Token
 
         return _success(['token' => $token]);
     }
+
+    public function create()
+    {
+        $uid = 1;
+        $instance = JwtAuth::instance();
+        // issue token
+        $token      = $instance->setUid($uid)->encode()->getToken();
+        $expireTime = $instance->getExpireTime()->getTimestamp();
+
+        return _success(['token' => $token]);
+    }
 }

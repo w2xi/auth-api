@@ -64,7 +64,7 @@ class JwtAuth
             // it means the token can only be used after 1 minute,
             // just comment it.
             // ->canOnlyBeUsedAfter($now->modify('+1 minute'))
-            ->expiresAt($now->modify('+1 hour'))
+            ->expiresAt($now->modify('+10 hour'))
             ->withClaim('uid', $this->uid)
             ->getToken(self::$config->signer(), self::$config->signingKey());
 

@@ -13,6 +13,32 @@ use think\Request;
 
 class Blog extends Base
 {
+    public $noNeedLogin = ['read', 'detail', 'search'];
+
+    public function read(Request $request)
+    {
+        $page       = $request->param('page', 1);
+        $count      = $request->param('count', 10);
+        $keyword    = $request->param('keyword', '');
+
+        $where['content'] = ['like', "%{$keyword}%"];
+
+        $result = BlogModel::getList($page, $count, $where);
+
+        return _success($result);
+    }
+
+    public function detail(Request $request)
+    {
+        (new IDMustBePositiveInt())->goCheck();
+        $blog = BlogModel::get($request->param('id'), ['user']);
+
+        if (!$blog) {
+            return _error('blog item not exists');
+        }
+        return _success($blog);
+    }
+
     public function search($keyword = '')
     {
         $result = (new BlogModel())->whereLike('content', "%{$keyword}%")->select();
@@ -147,26 +173,6 @@ class Blog extends Base
         $blog->save();
 
         return _success($blogLike);
-    }
-
-    public function detail(Request $request)
-    {
-        (new IDMustBePositiveInt())->goCheck();
-        $blog = BlogModel::get($request->param('id'), ['user']);
-
-        if (!$blog) {
-            return _error('blog item not exists');
-        }
-        return _success($blog);
-    }
-
-    public function read(Request $request)
-    {
-        $page   = $request->param('page', 1);
-        $count  = $request->param('count', 10);
-        $result = BlogModel::getList($page, $count);
-
-        return _success($result);
     }
 
     public function add(Request $request)
